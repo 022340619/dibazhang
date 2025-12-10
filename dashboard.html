@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 数据可视化仪表板</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-tab {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            color: #333;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        /* 表格样式 */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        tr:hover {
+            background: #e3f2fd;
+        }
+
+        .numeric {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .positive {
+            color: #4caf50;
+        }
+
+        .negative {
+            color: #f44336;
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin: 20px 0;
+        }
+
+        /* 统计卡片 */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card.primary { border-left-color: #667eea; }
+        .stat-card.success { border-left-color: #4caf50; }
+        .stat-card.warning { border-left-color: #ff9800; }
+        .stat-card.danger { border-left-color: #f44336; }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .nav-tabs {
+                justify-content: stretch;
+            }
+            
+            .nav-tab {
+                flex: 1;
+                text-align: center;
+                padding: 10px 5px;
+                font-size: 14px;
+            }
+            
+            .card {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 8px;
+                font-size: 12px;
+            }
+        }
+
+        /* 加载状态 */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        /* 高亮效果 */
+        .highlight {
+            background: linear-gradient(90deg, transparent, #fff3cd, transparent);
+            animation: highlight 2s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0%, 100% { background-position: -100% 0; }
+            50% { background-position: 100% 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 数据可视化仪表板</h1>
+            <p class="subtitle">产品销售 | 宠物市场 | 抖音增长 | 气象数据</p>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showSection('products')">📈 产品销售</button>
+            <button class="nav-tab" onclick="showSection('pets')">🐱🐶 宠物市场</button>
+            <button class="nav-tab" onclick="showSection('douyin')">📱 抖音增长</button>
+            <button class="nav-tab" onclick="showSection('weather')">🌤️ 气象数据</button>
+        </nav>
+
+        <!-- 产品销售数据 -->
+        <section id="products" class="section active">
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-value">342</div>
+                    <div class="stat-label">产品A总销量(亿元)</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value">318</div>
+                    <div class="stat-label">产品B总销量(亿元)</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value">28.5</div>
+                    <div class="stat-label">产品A月均销量</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value">26.5</div>
+                    <div class="stat-label">产品B月均销量</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">📊 月度销售数据表</h3>
+                    <div class="table-container">
+                        <table id="productTable">
+                            <thead>
+                                <tr>
+                                    <th>月份</th>
+                                    <th>产品A(亿元)</th>
+                                    <th>产品B(亿元)</th>
+                                    <th>总额(亿元)</th>
+                                    <th>A产品占比</th>
+                                    <th>B产品占比</th>
+                                    <th>环比增长</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">📈 销售趋势图表</h3>
+                    <div class="chart-container">
+                        <canvas id="productChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 宠物市场数据 -->
+        <section id="pets" class="section">
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-value">29.3%</div>
+                    <div class="stat-label">平均养猫比例</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value">33.7%</div>
+                    <div class="stat-label">平均养狗比例</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value">57%</div>
+                    <div class="stat-label">俄罗斯最高养猫比例</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value">64%</div>
+                    <div class="stat-label">墨西哥最高养狗比例</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">🐱🐶 全球宠物市场对比表</h3>
+                    <div class="table-container">
+                        <table id="petTable">
+                            <thead>
+                                <tr>
+                                    <th>国家/地区</th>
+                                    <th>养猫比例(%)</th>
+                                    <th>养狗比例(%)</th>
+                                    <th>总养宠比例(%)</th>
+                                    <th>偏好类型</th>
+                                    <th>养宠排名</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">📊 宠物市场分布图表</h3>
+                    <div class="chart-container">
+                        <canvas id="petChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 抖音增长数据 -->
+        <section id="douyin" class="section">
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-value">80倍</div>
+                    <div class="stat-label">平均增长倍数</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value">132倍</div>
+                    <div class="stat-label">四线及以外最高增长</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value">35%</div>
+                    <div class="stat-label">2017年一线城市占比</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value">27%</div>
+                    <div class="stat-label">2018年三线城市占比</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">📱 抖音用户增长分析表</h3>
+                    <div class="table-container">
+                        <table id="douyinTable">
+                            <thead>
+                                <tr>
+                                    <th>城市级别</th>
+                                    <th>2017年占比(%)</th>
+                                    <th>2018年占比(%)</th>
+                                    <th>增长倍数</th>
+                                    <th>占比变化</th>
+                                    <th>增长排名</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">📈 用户增长趋势图表</h3>
+                    <div class="chart-container">
+                        <canvas id="douyinChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 气象数据 -->
+        <section id="weather" class="section">
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-value">622.4mm</div>
+                    <div class="stat-label">年总降水量</div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-value">531.6mm</div>
+                    <div class="stat-label">年总蒸发量</div>
+                </div>
+                <div class="stat-card warning">
+                    <div class="stat-value">11.4°C</div>
+                    <div class="stat-label">年平均气温</div>
+                </div>
+                <div class="stat-card danger">
+                    <div class="stat-value">33.4°C</div>
+                    <div class="stat-label">8月最高气温</div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3 class="card-title">🌤️ 全年气象数据表</h3>
+                    <div class="table-container">
+                        <table id="weatherTable">
+                            <thead>
+                                <tr>
+                                    <th>月份</th>
+                                    <th>平均气温(°C)</th>
+                                    <th>降水量(mm)</th>
+                                    <th>蒸发量(mm)</th>
+                                    <th>降水蒸发差</th>
+                                    <th>季节</th>
+                                    <th>温度趋势</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title">📊 气象变化趋势图表</h3>
+                    <div class="chart-container">
+                        <canvas id="weatherChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 数据存储
+        const data = {
+            products: {
+                months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                productA: [20, 28, 23, 16, 29, 36, 39, 33, 31, 19, 21, 25],
+                productB: [17, 22, 39, 26, 35, 23, 25, 27, 29, 38, 28, 20]
+            },
+            pets: {
+                countries: ['中国', '加拿大', '巴西', '澳大利亚', '日本', '墨西哥', '俄罗斯', '韩国', '瑞士', '土耳其', '英国', '美国'],
+                catData: [19, 33, 28, 29, 14, 24, 57, 6, 26, 15, 27, 39],
+                dogData: [25, 33, 58, 39, 15, 64, 29, 23, 22, 11, 27, 50]
+            },
+            douyin: {
+                cities: ['一线城市', '二线城市', '三线城市', '四线及以外', '其他国家及地区'],
+                data2017: [21, 35, 22, 19, 3],
+                data2018: [13, 32, 27, 27, 1],
+                growth: [51, 73, 99, 132, 45]
+            },
+            weather: {
+                months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                temperature: [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 33.4, 23.0, 16.5, 12.0, 6.2],
+                precipitation: [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
+                evaporation: [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3]
+            }
+        };
+
+        // 切换页面
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            setTimeout(() => {
+                initSection(sectionId);
+            }, 100);
+        }
+
+        // 初始化各个板块
+        function initSection(sectionId) {
+            switch(sectionId) {
+                case 'products':
+                    initProductSection();
+                    break;
+                case 'pets':
+                    initPetSection();
+                    break;
+                case 'douyin':
+                    initDouyinSection();
+                    break;
+                case 'weather':
+                    initWeatherSection();
+                    break;
+            }
+        }
+
+        // 初始化产品销售板块
+        function initProductSection() {
+            initProductTable();
+            initProductChart();
+        }
+
+        // 产品销售表格
+        function initProductTable() {
+            const tbody = document.querySelector('#productTable tbody');
+            tbody.innerHTML = '';
+
+            for (let i = 0; i < data.products.months.length; i++) {
+                const month = data.products.months[i];
+                const a = data.products.productA[i];
+                const b = data.products.productB[i];
+                const total = a + b;
+                const aPercent = ((a / total) * 100).toFixed(1);
+                const bPercent = ((b / total) * 100).toFixed(1);
+                
+                let growth = '';
+                if (i > 0) {
+                    const prevTotal = data.products.productA[i-1] + data.products.productB[i-1];
+                    const growthRate = ((total - prevTotal) / prevTotal * 100).toFixed(1);
+                    growth = `<span class="${growthRate >= 0 ? 'positive' : 'negative'}">${growthRate >= 0 ? '+' : ''}${growthRate}%</span>`;
+                } else {
+                    growth = '<span>-</span>';
+                }
+
+                const row = `
+                    <tr>
+                        <td><strong>${month}</strong></td>
+                        <td class="numeric">${a}</td>
+                        <td class="numeric">${b}</td>
+                        <td class="numeric"><strong>${total}</strong></td>
+                        <td class="numeric">${aPercent}%</td>
+                        <td class="numeric">${bPercent}%</td>
+                        <td>${growth}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            }
+        }
+
+        // 产品销售图表
+        function initProductChart() {
+            const ctx = document.getElementById('productChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.products.months,
+                    datasets: [{
+                        label: '产品A',
+                        data: data.products.productA,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }, {
+                        label: '产品B',
+                        data: data.products.productB,
+                        borderColor: '#764ba2',
+                        backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '产品月度销售趋势'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '销售额 (亿元)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 初始化宠物市场板块
+        function initPetSection() {
+            initPetTable();
+            initPetChart();
+        }
+
+        // 宠物市场表格
+        function initPetTable() {
+            const tbody = document.querySelector('#petTable tbody');
+            tbody.innerHTML = '';
+
+            // 创建排序数据
+            const sortedData = [];
+            for (let i = 0; i < data.pets.countries.length; i++) {
+                sortedData.push({
+                    country: data.pets.countries[i],
+                    cat: data.pets.catData[i],
+                    dog: data.pets.dogData[i],
+                    total: data.pets.catData[i] + data.pets.dogData[i]
+                });
+            }
+            sortedData.sort((a, b) => b.total - a.total);
+
+            sortedData.forEach((item, index) => {
+                const preference = item.cat > item.dog ? '偏爱猫咪' : '偏爱狗狗';
+                const rank = index + 1;
+
+                const row = `
+                    <tr>
+                        <td><strong>${item.country}</strong></td>
+                        <td class="numeric">${item.cat}%</td>
+                        <td class="numeric">${item.dog}%</td>
+                        <td class="numeric"><strong>${item.total}%</strong></td>
+                        <td>${preference}</td>
+                        <td class="numeric">${rank}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // 宠物市场图表
+        function initPetChart() {
+            const ctx = document.getElementById('petChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.pets.countries,
+                    datasets: [{
+                        label: '养猫比例',
+                        data: data.pets.catData,
+                        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                        borderColor: '#667eea',
+                        borderWidth: 1
+                    }, {
+                        label: '养狗比例',
+                        data: data.pets.dogData,
+                        backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                        borderColor: '#764ba2',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '全球宠物养宠比例对比'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '比例 (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 初始化抖音增长板块
+        function initDouyinSection() {
+            initDouyinTable();
+            initDouyinChart();
+        }
+
+        // 抖音增长表格
+        function initDouyinTable() {
+            const tbody = document.querySelector('#douyinTable tbody');
+            tbody.innerHTML = '';
+
+            // 创建排序数据
+            const sortedData = [];
+            for (let i = 0; i < data.douyin.cities.length; i++) {
+                sortedData.push({
+                    city: data.douyin.cities[i],
+                    rate2017: data.douyin.data2017[i],
+                    rate2018: data.douyin.data2018[i],
+                    growth: data.douyin.growth[i],
+                    change: data.douyin.data2018[i] - data.douyin.data2017[i]
+                });
+            }
+            sortedData.sort((a, b) => b.growth - a.growth);
+
+            sortedData.forEach((item, index) => {
+                const changeStr = item.change > 0 ? 
+                    `<span class="positive">+${item.change}%</span>` : 
+                    `<span class="negative">${item.change}%</span>`;
+                const rank = index + 1;
+
+                const row = `
+                    <tr>
+                        <td><strong>${item.city}</strong></td>
+                        <td class="numeric">${item.rate2017}%</td>
+                        <td class="numeric">${item.rate2018}%</td>
+                        <td class="numeric"><strong>${item.growth}倍</strong></td>
+                        <td>${changeStr}</td>
+                        <td class="numeric">${rank}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // 抖音增长图表
+        function initDouyinChart() {
+            const ctx = document.getElementById('douyinChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.douyin.cities,
+                    datasets: [{
+                        label: '2017年占比',
+                        data: data.douyin.data2017,
+                        backgroundColor: 'rgba(255, 152, 0, 0.8)',
+                        borderColor: '#ff9800',
+                        borderWidth: 1
+                    }, {
+                        label: '2018年占比',
+                        data: data.douyin.data2018,
+                        backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                        borderColor: '#4caf50',
+                        borderWidth: 1
+                    }, {
+                        label: '增长倍数',
+                        data: data.douyin.growth,
+                        type: 'line',
+                        borderColor: '#f44336',
+                        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '抖音用户增长分析'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '占比 (%)'
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '增长倍数'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 初始化气象数据板块
+        function initWeatherSection() {
+            initWeatherTable();
+            initWeatherChart();
+        }
+
+        // 气象数据表格
+        function initWeatherTable() {
+            const tbody = document.querySelector('#weatherTable tbody');
+            tbody.innerHTML = '';
+
+            const seasons = ['冬季', '冬季', '春季', '春季', '春季', '夏季', '夏季', '夏季', '秋季', '秋季', '秋季', '冬季'];
+
+            for (let i = 0; i < data.weather.months.length; i++) {
+                const month = data.weather.months[i];
+                const temp = data.weather.temperature[i];
+                const precip = data.weather.precipitation[i];
+                const evap = data.weather.evaporation[i];
+                const diff = precip - evap;
+                const season = seasons[i];
+                
+                let trend = '';
+                if (i > 0) {
+                    const prevTemp = data.weather.temperature[i-1];
+                    if (temp > prevTemp) {
+                        trend = '<span class="positive">↑ 上升</span>';
+                    } else if (temp < prevTemp) {
+                        trend = '<span class="negative">↓ 下降</span>';
+                    } else {
+                        trend = '<span>→ 持平</span>';
+                    }
+                } else {
+                    trend = '<span>-</span>';
+                }
+
+                const diffStr = diff >= 0 ? 
+                    `<span class="positive">+${diff.toFixed(1)}</span>` : 
+                    `<span class="negative">${diff.toFixed(1)}</span>`;
+
+                const row = `
+                    <tr>
+                        <td><strong>${month}</strong></td>
+                        <td class="numeric">${temp}°C</td>
+                        <td class="numeric">${precip}</td>
+                        <td class="numeric">${evap}</td>
+                        <td>${diffStr}</td>
+                        <td>${season}</td>
+                        <td>${trend}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            }
+        }
+
+        // 气象数据图表
+        function initWeatherChart() {
+            const ctx = document.getElementById('weatherChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.weather.months,
+                    datasets: [{
+                        label: '降水量 (mm)',
+                        data: data.weather.precipitation,
+                        backgroundColor: 'rgba(33, 150, 243, 0.8)',
+                        borderColor: '#2196f3',
+                        borderWidth: 1
+                    }, {
+                        label: '蒸发量 (mm)',
+                        data: data.weather.evaporation,
+                        backgroundColor: 'rgba(255, 193, 7, 0.8)',
+                        borderColor: '#ffc107',
+                        borderWidth: 1
+                    }, {
+                        label: '平均气温 (°C)',
+                        data: data.weather.temperature,
+                        type: 'line',
+                        borderColor: '#e91e63',
+                        backgroundColor: 'rgba(233, 30, 99, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: '全年气象变化趋势'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '水量 (mm)'
+                            }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '气温 (°C)'
+                            },
+                            grid: {
+                                drawOnChartArea: false
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('数据可视化仪表板加载完成');
+            initProductSection();
+        });
+
+        // 添加表格行悬停效果
+        document.addEventListener('DOMContentLoaded', function() {
+            const tables = document.querySelectorAll('table');
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach((row, index) => {
+                    row.addEventListener('mouseenter', function() {
+                        this.classList.add('highlight');
+                        setTimeout(() => {
+                            this.classList.remove('highlight');
+                        }, 2000);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

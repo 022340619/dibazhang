@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌈 色彩鲜艳的数据可视化</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7, #DDA0DD, #98D8C8, #FFD93D);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 动态背景装饰 */
+        .bg-decoration {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(40px);
+            opacity: 0.7;
+            animation: float 20s infinite ease-in-out;
+            pointer-events: none;
+        }
+
+        .bg-decoration:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            top: -150px;
+            right: -150px;
+            animation-delay: 0s;
+        }
+
+        .bg-decoration:nth-child(2) {
+            width: 250px;
+            height: 250px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            bottom: -125px;
+            left: -125px;
+            animation-delay: 3s;
+        }
+
+        .bg-decoration:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            top: 50%;
+            left: -100px;
+            animation-delay: 6s;
+        }
+
+        .bg-decoration:nth-child(4) {
+            width: 350px;
+            height: 350px;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            top: 20%;
+            right: -175px;
+            animation-delay: 9s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(30px) rotate(240deg); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: slideDown 1s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255,255,255,0.3);
+            animation: textGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes textGlow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 20px rgba(255,255,255,0.5)); }
+            50% { filter: brightness(1.2) drop-shadow(0 0 30px rgba(255,255,255,0.8)); }
+        }
+
+        .subtitle {
+            color: white;
+            font-size: 1.4em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+
+        .navigation {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 12px 25px;
+            margin: 0 8px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .nav-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            background: rgba(255,255,255,0.3);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1, #96CEB4, #FFEAA7);
+            border-radius: 25px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+        }
+
+        .chart-card:hover::before {
+            opacity: 1;
+        }
+
+        .chart-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.2);
+        }
+
+        .chart-title {
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #45B7D1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .chart-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #FF6B6B, #4ECDC4, #45B7D1);
+            border-radius: 2px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.5);
+            padding: 10px;
+        }
+
+        .chart-description {
+            color: #555;
+            line-height: 1.6;
+            text-align: center;
+            font-size: 0.95em;
+            font-style: italic;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+
+        .status-message {
+            text-align: center;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .status-loading {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .status-error {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .chart-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            h1 {
+                font-size: 2.5em;
+            }
+            
+            .chart-card {
+                padding: 20px;
+            }
+            
+            .nav-btn {
+                padding: 10px 18px;
+                margin: 5px;
+                font-size: 14px;
+            }
+        }
+
+        /* 额外的视觉效果 */
+        .sparkle {
+            position: fixed;
+            pointer-events: none;
+            animation: sparkle 3s linear;
+            z-index: 9999;
+        }
+
+        @keyframes sparkle {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100vh) scale(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 动态背景装饰 -->
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+    <div class="bg-decoration"></div>
+
+    <div class="container">
+        <header>
+            <h1>🌈 色彩鲜艳的数据可视化</h1>
+            <p class="subtitle">基于第5章Matplotlib技术的绚丽展示</p>
+        </header>
+
+        <div id="chartLoadStatus" class="status-message status-loading">
+            ✨ 正在加载炫彩图表库...
+        </div>
+
+        <nav class="navigation">
+            <button class="nav-btn active" onclick="showSection('products')">📊 产品销售额</button>
+            <button class="nav-btn" onclick="showSection('pets')">🐱🐶 养宠比例</button>
+            <button class="nav-btn" onclick="showSection('douyin')">📱 抖音用户</button>
+            <button class="nav-btn" onclick="showSection('weather')">🌤️ 气象数据</button>
+        </nav>
+
+        <section id="products" class="section active">
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">📈 产品A与产品B月度销售额趋势</h3>
+                    <div class="chart-container">
+                        <canvas id="productLineChart"></canvas>
+                    </div>
+                    <p class="chart-description">🎯 展示产品A和产品B在12个月内的销售额变化趋势，便于比较两者的销售表现</p>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">🎨 产品A年度销售额分布</h3>
+                    <div class="chart-container">
+                        <canvas id="productAPieChart"></canvas>
+                    </div>
+                    <p class="chart-description">🌈 产品A各月份销售额占比分析，了解销售的季节性分布特征</p>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">🎪 产品B年度销售额分布</h3>
+                    <div class="chart-container">
+                        <canvas id="productBPieChart"></canvas>
+                    </div>
+                    <p class="chart-description">🎭 产品B各月份销售额占比分析，观察其销售模式与产品A的差异</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="pets" class="section">
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">🐱 部分国家养猫人群比例</h3>
+                    <div class="chart-container">
+                        <canvas id="catBarChart"></canvas>
+                    </div>
+                    <p class="chart-description">🌍 全球12个国家和地区养猫人群的比例对比，反映不同地区的宠物偏好</p>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">🐶 部分国家养狗人群比例</h3>
+                    <div class="chart-container">
+                        <canvas id="dogBarChart"></canvas>
+                    </div>
+                    <p class="chart-description">🏘️ 全球12个国家和地区养狗人群的比例对比，展现养宠文化的地域差异</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="douyin" class="section">
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">🚀 抖音2018vs2017人群增长倍数</h3>
+                    <div class="chart-container">
+                        <canvas id="douyinGrowthChart"></canvas>
+                    </div>
+                    <p class="chart-description">📈 抖音不同城市级别用户增长倍数对比，显示平台在各线城市的快速发展</p>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">🌆 2017年抖音用户地区分布</h3>
+                    <div class="chart-container">
+                        <canvas id="douyin2017Chart"></canvas>
+                    </div>
+                    <p class="chart-description">🏙️ 2017年抖音用户地域分布情况，反映早期用户主要集中在一线城市</p>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">🌏 2018年抖音用户地区分布</h3>
+                    <div class="chart-container">
+                        <canvas id="douyin2018Chart"></canvas>
+                    </div>
+                    <p class="chart-description">🌃 2018年抖音用户地域分布变化，显示用户向二三线城市扩散的趋势</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="weather" class="section">
+            <div class="chart-grid">
+                <div class="chart-card">
+                    <h3 class="chart-title">🌤️ 全年平均气温与降水量、蒸发量的关系</h3>
+                    <div class="chart-container">
+                        <canvas id="weatherChart"></canvas>
+                    </div>
+                    <p class="chart-description">🌈 展示全年12个月的气温变化与降水量、蒸发量的关系，体现气候的季节性特征</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 创建闪烁星星效果
+        function createSparkle() {
+            const sparkle = document.createElement('div');
+            sparkle.className = 'sparkle';
+            sparkle.innerHTML = '✨';
+            sparkle.style.left = Math.random() * window.innerWidth + 'px';
+            sparkle.style.top = window.innerHeight + 'px';
+            sparkle.style.fontSize = Math.random() * 20 + 10 + 'px';
+            document.body.appendChild(sparkle);
+            
+            setTimeout(() => {
+                sparkle.remove();
+            }, 3000);
+        }
+
+        // 定期创建星星
+        setInterval(createSparkle, 500);
+
+        // 等待Chart.js加载完成
+        function waitForChartJS() {
+            const statusDiv = document.getElementById('chartLoadStatus');
+            
+            if (typeof Chart !== 'undefined') {
+                statusDiv.className = 'status-message status-success';
+                statusDiv.innerHTML = '🎉 炫彩图表库加载成功！';
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                    initAllCharts();
+                }, 1500);
+            } else {
+                statusDiv.className = 'status-message status-loading';
+                statusDiv.innerHTML = '✨ 正在加载炫彩图表库，请稍候...';
+                setTimeout(waitForChartJS, 500);
+            }
+        }
+
+        // 全局配置 - 使用鲜艳的颜色
+        Chart.defaults.font.family = "'Segoe UI', 'Microsoft YaHei', Arial, sans-serif";
+        Chart.defaults.color = '#333';
+        
+        // 自定义鲜艳的调色板
+        const vibrantColors = {
+            primary: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#FFD93D'],
+            secondary: ['#FF8A80', '#80CBC4', '#81C784', '#FFB74D', '#E1BEE7', '#64B5F6', '#4FC3F7', '#AED581'],
+            rainbow: ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#9400D3'],
+            pastel: ['#FFB3BA', '#FFDFBA', '#FFFFBA', '#BAFFC9', '#BAE1FF', '#E0BBE4', '#FFDFD3', '#C8E6C9']
+        };
+        
+        // 显示不同的section
+        function showSection(sectionId) {
+            try {
+                // 隐藏所有section
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // 显示选中的section
+                document.getElementById(sectionId).classList.add('active');
+                
+                // 更新导航按钮状态
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                // 初始化对应的图表
+                setTimeout(() => {
+                    initCharts(sectionId);
+                }, 100);
+            } catch (error) {
+                console.error('切换section时出错:', error);
+            }
+        }
+
+        // 初始化所有图表
+        function initAllCharts() {
+            try {
+                console.log('🎨 开始初始化炫彩图表...');
+                initProductCharts();
+                initPetCharts();
+                initDouyinCharts();
+                initWeatherChart();
+                console.log('🌈 所有炫彩图表初始化完成');
+            } catch (error) {
+                console.error('初始化炫彩图表时出错:', error);
+                document.getElementById('chartLoadStatus').className = 'status-message status-error';
+                document.getElementById('chartLoadStatus').innerHTML = `❌ 炫彩图表初始化失败: ${error.message}`;
+            }
+        }
+
+        // 初始化图表
+        function initCharts(sectionId) {
+            try {
+                console.log(`🎭 初始化 ${sectionId} 的炫彩图表...`);
+                switch(sectionId) {
+                    case 'products':
+                        initProductCharts();
+                        break;
+                    case 'pets':
+                        initPetCharts();
+                        break;
+                    case 'douyin':
+                        initDouyinCharts();
+                        break;
+                    case 'weather':
+                        initWeatherChart();
+                        break;
+                }
+            } catch (error) {
+                console.error(`初始化 ${sectionId} 炫彩图表时出错:`, error);
+            }
+        }
+
+        // 产品销售额图表
+        function initProductCharts() {
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const productA = [20, 28, 23, 16, 29, 36, 39, 33, 31, 19, 21, 25];
+            const productB = [17, 22, 39, 26, 35, 23, 25, 27, 29, 38, 28, 20];
+
+            // 线图
+            const lineCtx = document.getElementById('productLineChart');
+            if (lineCtx && !lineCtx.chart) {
+                try {
+                    lineCtx.chart = new Chart(lineCtx, {
+                        type: 'line',
+                        data: {
+                            labels: months,
+                            datasets: [{
+                                label: '产品A',
+                                data: productA,
+                                borderColor: vibrantColors.primary[0],
+                                backgroundColor: vibrantColors.primary[0] + '33',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                pointBackgroundColor: vibrantColors.primary[0],
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }, {
+                                label: '产品B',
+                                data: productB,
+                                borderColor: vibrantColors.primary[1],
+                                backgroundColor: vibrantColors.primary[1] + '33',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                pointBackgroundColor: vibrantColors.primary[1],
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 6,
+                                pointHoverRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        padding: 15,
+                                        font: { size: 14, weight: 'bold' }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255,255,255,0.9)',
+                                    titleColor: '#333',
+                                    bodyColor: '#666',
+                                    borderColor: vibrantColors.primary[0],
+                                    borderWidth: 2,
+                                    cornerRadius: 10,
+                                    padding: 12
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: '销售额 (亿元)',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.05)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.05)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('🌟 产品线图创建成功');
+                } catch (error) {
+                    console.error('创建产品线图失败:', error);
+                }
+            }
+
+            // 产品A饼图
+            const pieACtx = document.getElementById('productAPieChart');
+            if (pieACtx && !pieACtx.chart) {
+                try {
+                    pieACtx.chart = new Chart(pieACtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: months,
+                            datasets: [{
+                                data: productA,
+                                backgroundColor: vibrantColors.rainbow,
+                                borderColor: '#fff',
+                                borderWidth: 2,
+                                hoverOffset: 15
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        padding: 15,
+                                        font: { size: 12 },
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255,255,255,0.9)',
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            const sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed / sum) * 100).toFixed(1);
+                                            label += percentage + '%';
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('🍩 产品A饼图创建成功');
+                } catch (error) {
+                    console.error('创建产品A饼图失败:', error);
+                }
+            }
+
+            // 产品B饼图
+            const pieBCtx = document.getElementById('productBPieChart');
+            if (pieBCtx && !pieBCtx.chart) {
+                try {
+                    pieBCtx.chart = new Chart(pieBCtx, {
+                        type: 'polarArea',
+                        data: {
+                            labels: months,
+                            datasets: [{
+                                data: productB,
+                                backgroundColor: vibrantColors.pastel.map(color => color + 'CC'),
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        padding: 15,
+                                        font: { size: 12 },
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            const sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed / sum) * 100).toFixed(1);
+                                            label += percentage + '%';
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('🎪 产品B极坐标图创建成功');
+                } catch (error) {
+                    console.error('创建产品B极坐标图失败:', error);
+                }
+            }
+        }
+
+        // 宠物比例图表
+        function initPetCharts() {
+            const countries = ['中国', '加拿大', '巴西', '澳大利亚', '日本', '墨西哥', '俄罗斯', '韩国', '瑞士', '土耳其', '英国', '美国'];
+            const catData = [19, 33, 28, 29, 14, 24, 57, 6, 26, 15, 27, 39];
+            const dogData = [25, 33, 58, 39, 15, 64, 29, 23, 22, 11, 27, 50];
+
+            // 猫比例水平条形图
+            const catCtx = document.getElementById('catBarChart');
+            if (catCtx && !catCtx.chart) {
+                try {
+                    catCtx.chart = new Chart(catCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: countries,
+                            datasets: [{
+                                label: '养猫人群比例 (%)',
+                                data: catData,
+                                backgroundColor: vibrantColors.secondary.map((color, index) => 
+                                    color + Math.floor(150 - index * 10).toString(16)
+                                ),
+                                borderColor: vibrantColors.secondary[0],
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                borderSkipped: false
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: '比例 (%)',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.05)'
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('🐱 养猫图表创建成功');
+                } catch (error) {
+                    console.error('创建养猫图表失败:', error);
+                }
+            }
+
+            // 狗比例水平条形图
+            const dogCtx = document.getElementById('dogBarChart');
+            if (dogCtx && !dogCtx.chart) {
+                try {
+                    dogCtx.chart = new Chart(dogCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: countries,
+                            datasets: [{
+                                label: '养狗人群比例 (%)',
+                                data: dogData,
+                                backgroundColor: vibrantColors.primary.map((color, index) => 
+                                    color + Math.floor(180 - index * 12).toString(16)
+                                ),
+                                borderColor: vibrantColors.primary[2],
+                                borderWidth: 2,
+                                borderRadius: 8,
+                                borderSkipped: false
+                            }]
+                        },
+                        options: {
+                            indexAxis: 'y',
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: '比例 (%)',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.05)'
+                                    }
+                                },
+                                y: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('🐶 养狗图表创建成功');
+                } catch (error) {
+                    console.error('创建养狗图表失败:', error);
+                }
+            }
+        }
+
+        // 抖音用户分析图表
+        function initDouyinCharts() {
+            const cities = ['一线城市', '二线城市', '三线城市', '四线及以外', '其他国家及地区'];
+            const growthData = [51, 73, 99, 132, 45];
+            const data2017 = [21, 35, 22, 19, 3];
+            const data2018 = [13, 32, 27, 27, 1];
+
+            // 增长倍数柱状图
+            const growthCtx = document.getElementById('douyinGrowthChart');
+            if (growthCtx && !growthCtx.chart) {
+                try {
+                    growthCtx.chart = new Chart(growthCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: cities,
+                            datasets: [{
+                                label: '增长倍数',
+                                data: growthData,
+                                backgroundColor: [
+                                    vibrantColors.primary[0] + 'CC',
+                                    vibrantColors.primary[1] + 'CC',
+                                    vibrantColors.primary[2] + 'CC',
+                                    vibrantColors.primary[3] + 'CC',
+                                    vibrantColors.primary[4] + 'CC'
+                                ],
+                                borderColor: vibrantColors.primary.map(color => color),
+                                borderWidth: 3,
+                                borderRadius: 10,
+                                borderSkipped: false
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: '增长倍数',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.05)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('🚀 抖音增长图表创建成功');
+                } catch (error) {
+                    console.error('创建抖音增长图表失败:', error);
+                }
+            }
+
+            // 2017年饼图
+            const ctx2017 = document.getElementById('douyin2017Chart');
+            if (ctx2017 && !ctx2017.chart) {
+                try {
+                    ctx2017.chart = new Chart(ctx2017, {
+                        type: 'pie',
+                        data: {
+                            labels: cities,
+                            datasets: [{
+                                data: data2017,
+                                backgroundColor: vibrantColors.rainbow,
+                                borderColor: '#fff',
+                                borderWidth: 3,
+                                hoverOffset: 20
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        padding: 15,
+                                        font: { size: 12, weight: 'bold' },
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            const sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed / sum) * 100).toFixed(1);
+                                            label += percentage + '%';
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('🏙️ 抖音2017图表创建成功');
+                } catch (error) {
+                    console.error('创建抖音2017图表失败:', error);
+                }
+            }
+
+            // 2018年饼图
+            const ctx2018 = document.getElementById('douyin2018Chart');
+            if (ctx2018 && !ctx2018.chart) {
+                try {
+                    ctx2018.chart = new Chart(ctx2018, {
+                        type: 'pie',
+                        data: {
+                            labels: cities,
+                            datasets: [{
+                                data: data2018,
+                                backgroundColor: vibrantColors.pastel.map(color => color + 'EE'),
+                                borderColor: '#fff',
+                                borderWidth: 3,
+                                hoverOffset: 20
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'right',
+                                    labels: {
+                                        padding: 15,
+                                        font: { size: 12, weight: 'bold' },
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            const sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = ((context.parsed / sum) * 100).toFixed(1);
+                                            label += percentage + '%';
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    console.log('🌃 抖音2018图表创建成功');
+                } catch (error) {
+                    console.error('创建抖音2018图表失败:', error);
+                }
+            }
+        }
+
+        // 气象数据图表
+        function initWeatherChart() {
+            const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+            const temperature = [2.0, 2.2, 3.3, 4.5, 6.3, 10.2, 20.3, 33.4, 23.0, 16.5, 12.0, 6.2];
+            const precipitation = [2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3];
+            const evaporation = [2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3];
+
+            const weatherCtx = document.getElementById('weatherChart');
+            if (weatherCtx && !weatherCtx.chart) {
+                try {
+                    weatherCtx.chart = new Chart(weatherCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: months,
+                            datasets: [
+                                {
+                                    label: '蒸发量 (ml)',
+                                    data: evaporation,
+                                    backgroundColor: vibrantColors.primary[4] + 'AA',
+                                    borderColor: vibrantColors.primary[4],
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                    stack: 'water'
+                                },
+                                {
+                                    label: '降水量 (ml)',
+                                    data: precipitation,
+                                    backgroundColor: vibrantColors.primary[1] + 'AA',
+                                    borderColor: vibrantColors.primary[1],
+                                    borderWidth: 2,
+                                    borderRadius: 6,
+                                    stack: 'water'
+                                },
+                                {
+                                    label: '平均气温 (°C)',
+                                    data: temperature,
+                                    type: 'line',
+                                    borderColor: vibrantColors.primary[0],
+                                    backgroundColor: vibrantColors.primary[0] + '33',
+                                    borderWidth: 4,
+                                    tension: 0.4,
+                                    pointBackgroundColor: vibrantColors.primary[0],
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2,
+                                    pointRadius: 6,
+                                    pointHoverRadius: 8,
+                                    yAxisID: 'y1'
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                    labels: {
+                                        padding: 15,
+                                        font: { size: 14, weight: 'bold' }
+                                    }
+                                },
+                                tooltip: {
+                                    backgroundColor: 'rgba(255,255,255,0.9)',
+                                    titleColor: '#333',
+                                    bodyColor: '#666',
+                                    borderColor: vibrantColors.primary[0],
+                                    borderWidth: 2,
+                                    cornerRadius: 10,
+                                    padding: 12
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                    title: {
+                                        display: true,
+                                        text: '月份',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    grid: {
+                                        display: false
+                                    }
+                                },
+                                y: {
+                                    stacked: true,
+                                    position: 'left',
+                                    title: {
+                                        display: true,
+                                        text: '水量 (ml)',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.05)'
+                                    }
+                                },
+                                y1: {
+                                    position: 'right',
+                                    title: {
+                                        display: true,
+                                        text: '气温 (°C)',
+                                        font: { size: 14, weight: 'bold' }
+                                    },
+                                    grid: {
+                                        drawOnChartArea: false
+                                    },
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                    console.log('🌤️ 气象图表创建成功');
+                } catch (error) {
+                    console.error('创建气象图表失败:', error);
+                }
+            }
+        }
+
+        // 页面加载完成后等待Chart.js
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎨 页面加载完成，开始等待炫彩Chart.js...');
+            setTimeout(waitForChartJS, 100);
+        });
+
+        // 监听错误
+        window.addEventListener('error', function(e) {
+            console.error('全局错误:', e.error);
+            const statusDiv = document.getElementById('chartLoadStatus');
+            if (statusDiv) {
+                statusDiv.className = 'status-message status-error';
+                statusDiv.innerHTML = `❌ 炫彩JavaScript错误: ${e.error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>
