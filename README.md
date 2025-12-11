@@ -1,197 +1,175 @@
-# 3D Data Visualization Platform 📊
+# 🎨 数据可视化展示平台
 
-一个基于Web技术的交互式3D数据可视化平台，展示了丰富的3D图表类型和可视化技术。
+一个基于Web的交互式数据可视化平台，展示多种数据可视化技术和图表类型。
 
-![3D Visualization](https://img.shields.io/badge/3D-Visualization-blue) 
-![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
-![Plotly](https://img.shields.io/badge/Plotly.js-3F4F75?style=flat&logo=plotly&logoColor=white)
+![数据可视化](https://img.shields.io/badge/数据可视化- Charts -blue.svg)
+![技术栈](https://img.shields.io/badge/技术栈-HTML5%20%7C%20JavaScript%20%7C%20CSS3-orange.svg)
+![许可证](https://img.shields.io/badge/许可证-MIT-green.svg)
 
-## ✨ 功能特性
+## 📖 项目简介
 
-### 🎯 核心功能
-- **6种3D图表类型**: 散点图、曲面图、线框图、人口分布图、柱状图、等高线图
-- **交互式控制**: 每个图表都有专属的控制按钮和交互功能
-- **响应式设计**: 完美适配桌面端和移动端
-- **实时数据更新**: 支持动态数据生成和图表更新
-- **3D视角控制**: 支持旋转、缩放、平移等3D操作
+本项目是基于《数据可视化》教材第8章内容开发的Web应用，包含了9种不同类型的数据可视化图表。通过现代化的Web技术，将这些经典的可视化方法以交互式的方式呈现，为数据分析和展示提供直观的工具。
 
-### 📊 图表类型
+## ✨ 功能特点
 
-| 图表类型 | 功能描述 | 交互特性 |
-|---------|---------|---------|
-| 🌟 **3D散点图** | 随机数据点分布可视化 | 重新生成数据、自动旋转 |
-| 🌊 **3D曲面图** | 正弦函数曲面展示 | 切换颜色映射、调整分辨率 |
-| 🔗 **3D线框图** | 网格结构显示 | 改变网格密度、切换显示模式 |
-| 🏙️ **人口分布图** | 城市人口数据可视化 | 数据筛选、动态缩放 |
-| 📈 **3D柱状图** | 多维数据对比分析 | 颜色切换、数据排序 |
-| 🗺️ **3D等高线图** | 地形起伏展示 | 等高线密度控制、填充模式 |
+- 🎯 **9种经典图表类型** - 涵盖从基础到高级的多种可视化方法
+- 🌐 **响应式设计** - 完美适配桌面和移动设备
+- 🎨 **现代化UI** - 采用Bootstrap 5和渐变色设计
+- ⚡ **纯前端实现** - 无需后端服务器，即开即用
+- 🖱️ **交互式体验** - 点击导航查看详细图表
+- 🌍 **中文支持** - 完整的中文界面和说明
+
+## 📊 支持的图表类型
+
+| 图表类型 | 描述 | 应用场景 |
+|---------|------|---------|
+| 🏔️ 等高线图 | 展示三维地形数据的等高线分布 | 地理数据、科学计算 |
+| 🌬️ 矢量场流线图 | 可视化流体运动和矢量场 | 流体动力学、气象数据 |
+| 📊 棉棒图 | 显示离散数据点的垂直线图 | 时间序列、离散数据 |
+| 🏋️ 哑铃图 | 比较两组数据之间的差异 | 对比分析、变化展示 |
+| 📋 甘特图 | 项目管理和时间规划 | 项目管理、进度跟踪 |
+| 👥 人口金字塔图 | 展示人口年龄和性别结构 | 人口统计、社会学 |
+| 📍 漏斗图 | 展示流程转化率和用户流失 | 营销分析、转化优化 |
+| 🔄 桑基图 | 显示流量和能量流向关系 | 能流分析、物料平衡 |
+| 🌳 树状图 | 展示层次结构和聚类分析 | 组织结构、分类体系 |
 
 ## 🚀 快速开始
 
-### 在线预览
-```bash
-# 克隆项目
-git clone https://github.com/yourusername/3d-visualization-platform.git
-cd 3d-visualization-platform
-
-# 启动本地服务器
-python -m http.server 8000
-# 或者使用 Node.js
-npx http-server
-
-# 访问 http://localhost:8000
+### 方法一：直接访问
+如果您已启动本地服务器，直接访问：
+```
+http://localhost:8000
 ```
 
-### 直接使用
-1. 下载 `index.html` 文件
-2. 用现代浏览器直接打开
-3. 开始探索各种3D图表
+### 方法二：本地运行
+1. 克隆或下载项目
+2. 进入项目目录
+3. 启动本地服务器
+
+```bash
+# 进入项目目录
+cd 数据可视化
+
+# 启动HTTP服务器（Python 3）
+python -m http.server 8000
+
+# 或使用Python 2
+python -m SimpleHTTPServer 8000
+
+# 或使用Node.js的http-server
+npx http-server
+```
+
+4. 在浏览器中访问 `http://localhost:8000`
 
 ## 🛠️ 技术栈
 
-- **前端框架**: 原生 HTML5 + CSS3 + JavaScript
-- **可视化引擎**: Plotly.js 2.27.0
-- **布局系统**: CSS Grid + Flexbox  
-- **动画效果**: CSS3 Transitions + Animations
-- **响应式设计**: Media Queries
+### 前端技术
+- **HTML5** - 页面结构和语义化标记
+- **CSS3** - 样式设计和动画效果
+- **JavaScript (ES6+)** - 核心逻辑和图表实现
+- **Bootstrap 5** - 响应式UI框架
+
+### 可视化库
+- **Canvas API** - 2D图形绘制
+- **Plotly.js** - 交互式图表库
+- **D3.js** - 数据驱动文档
+- **Chart.js** - 简单图表绘制
+
+### 开发工具
+- **Font Awesome** - 图标库
+- **Google Fonts** - 字体资源
 
 ## 📁 项目结构
 
 ```
-3d-visualization-platform/
-├── index.html              # 主页面文件
-├── README.md              # 项目文档
-└── 第7章(1).ipynb         # 原始数据源(Jupyter notebook)
+数据可视化/
+├── index.html          # 主页面文件
+├── charts.js           # 图表实现逻辑
+├── README.md           # 项目说明文档
+├── 第8章(1) (1).ipynb  # 原始Jupyter notebook（参考）
+└── assets/             # 静态资源（如需要）
 ```
 
-## 🎮 使用指南
+## 💡 使用说明
 
-### 基本操作
-- 🖱️ **拖拽旋转**: 按住鼠标左键拖拽旋转3D视角
-- 🔍 **滚轮缩放**: 使用鼠标滚轮缩放图表
-- 📱 **触摸支持**: 移动设备上支持触摸手势操作
+1. **主页浏览** - 打开网站后，您会看到9个图表卡片的网格布局
+2. **查看详情** - 点击任意卡片即可查看该图表的详细实现
+3. **返回主页** - 在详情页面点击"返回主页"按钮回到主界面
+4. **响应式体验** - 调整浏览器窗口大小体验响应式效果
 
-### 控制面板
-每个图表都配有专属的控制按钮：
-- **重新生成**: 生成新的随机数据
-- **切换颜色**: 改变配色方案
-- **调整参数**: 修改图表显示参数
-- **动画效果**: 启动自动动画
+## 🎯 图表详解
 
-## 🎨 设计亮点
+### 等高线图
+- **数据来源**: 模拟的三维地形函数
+- **实现方式**: Plotly.js的contour图表
+- **特色功能**: 颜色映射、等高线标注
 
-### 视觉设计
-- 🌈 **渐变背景**: 紫色渐变营造科技感氛围
-- 🎴 **卡片布局**: 清晰的信息层级和视觉分组
-- ✨ **悬浮效果**: 增强用户交互反馈
-- 🎬 **加载动画**: 流畅的入场动画效果
+### 矢量场流线图
+- **数据来源**: 数学矢量场函数
+- **实现方式**: Canvas 2D绘制
+- **特色功能**: 流线追踪、方向箭头
 
-### 用户体验
-- ⚡ **即时响应**: 所有操作都有即时反馈
-- 🔄 **状态提示**: 数据加载时显示加载状态
-- 📐 **自适应布局**: 智能适配不同屏幕尺寸
-- 🎯 **无缝交互**: 平滑的动画过渡效果
+### 棉棒图
+- **数据来源**: 月度时间序列数据
+- **实现方式**: Canvas绘制
+- **特色功能**: 垂直线、数据点标记
 
-## 📱 响应式支持
+### 甘特图
+- **数据来源**: 项目任务时间表
+- **实现方式**: Canvas绘制
+- **特色功能**: 任务条、时间轴、进度显示
 
-| 设备类型 | 屏幕宽度 | 布局适配 |
-|---------|---------|---------|
-| 🖥️ **桌面端** | > 768px | 多列网格布局 |
-| 📱 **平板端** | 481px - 768px | 双列布局 |
-| 📱 **手机端** | < 480px | 单列布局 |
-
-## 🌐 浏览器兼容性
-
-| 浏览器 | 版本要求 | 支持状态 |
-|-------|---------|---------|
-| 🌐 Chrome | 60+ | ✅ 完全支持 |
-| 🦊 Firefox | 55+ | ✅ 完全支持 |
-| 🍎 Safari | 12+ | ✅ 完全支持 |
-| 🪟 Edge | 79+ | ✅ 完全支持 |
-
-## 📊 数据来源
-
-项目数据基于原始Jupyter notebook文件 `第7章(1).ipynb`，包含：
-- 3D散点图示例数据集
-- 数学函数曲面数据
-- 美国城镇人口统计数据
-- matplotlib 3D绘图示例
-
-## 🔧 开发指南
+## 🔧 自定义开发
 
 ### 添加新图表
-```javascript
-function createNewChart() {
-    // 1. 生成数据
-    const data = generateData();
-    
-    // 2. 创建trace
-    const trace = {
-        type: 'scatter3d', // 或其他图表类型
-        x: data.x,
-        y: data.y,
-        z: data.z,
-        mode: 'markers'
-    };
-    
-    // 3. 配置layout
-    const layout = {
-        scene: {
-            xaxis: {title: 'X轴'},
-            yaxis: {title: 'Y轴'},
-            zaxis: {title: 'Z轴'}
-        },
-        autosize: true
-    };
-    
-    // 4. 渲染图表
-    Plotly.newPlot('chartId', [trace], layout, {responsive: true});
-}
-```
+1. 在`charts.js`中添加新的图表函数
+2. 在`index.html`中添加对应的卡片
+3. 更新导航逻辑
 
-### 自定义样式
-```css
-.chart-container {
-    height: 450px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-```
+### 修改样式
+- 主样式文件：`index.html`中的`<style>`标签
+- 图表特定样式：各图表函数中的Canvas/Plotly配置
+
+### 数据更新
+- 硬编码数据：直接修改`charts.js`中的数据数组
+- 动态数据：添加API调用或文件读取功能
+
+## 📝 开发计划
+
+- [ ] **数据导入功能** - 支持CSV、JSON等格式数据导入
+- [ ] **图表导出** - PNG、SVG格式导出功能
+- [ ] **更多图表类型** - 热力图、3D图表、地理图表等
+- [ ] **交互式编辑** - 在线编辑数据和样式
+- [ ] **图表模板** - 预设的图表模板和主题
+- [ ] **移动端优化** - 触摸操作优化
 
 ## 🤝 贡献指南
 
-欢迎贡献代码！请遵循以下步骤：
+欢迎提交Issue和Pull Request！
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+1. Fork 本项目
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
 3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
-
-## 📝 更新日志
-
-### v1.0.0 (2024-12-11)
-- ✨ 初始版本发布
-- 📊 6种3D图表类型
-- 🎮 完整的交互功能
-- 📱 响应式设计
-- 🎨 现代化UI设计
+5. 打开Pull Request
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
 ## 🙏 致谢
 
-- [Plotly.js](https://plotly.com/javascript/) - 强大的JavaScript图表库
-- [Matplotlib](https://matplotlib.org/) - Python数据可视化的灵感来源
-- 原始Jupyter notebook提供的数据和示例
+- 基于《数据可视化》教材第8章内容
+- 感谢Plotly.js、D3.js等开源可视化库
+- Bootstrap框架提供的响应式支持
+
+## 📞 联系方式
+
+- 项目主页：[GitHub Repository]
+- 问题反馈：[Issues页面]
+- 技术讨论：[Discussions页面]
 
 ---
 
-<div align="center">
-  <p>如果这个项目对你有帮助，请给个 ⭐️ Star！</p>
-  <p>Made with ❤️ by Data Visualization Enthusiast</p>
-</div>
+⭐ 如果这个项目对您有帮助，请给个Star！
